@@ -1,13 +1,9 @@
 {
   "name": "path-event",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "The base object of the ending asterisk path strategy",
   "main": "main.js",
-  "dependencies": {
-    
-  },
-  
-  
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git://github.com/manvalls/path-event.git"

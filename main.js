@@ -18,8 +18,6 @@ PathEvent.prototype.next = function(){
   if(!this.rest.length){
     name = this[remainingPath];
     
-    console.log(name);
-    
     if(e.target.listeners(name)){
       e.give(name,this);
       return;
@@ -31,8 +29,6 @@ PathEvent.prototype.next = function(){
   while(this[remainingPath].length > 1){
     this.rest.push(this[remainingPath].pop());
     name = this[remainingPath].concat('*').join('/');
-    
-    console.log(name);
     
     if(e.target.listeners(name)){
       e.give(name,this);

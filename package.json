@@ -1,6 +1,6 @@
 {
   "name": "path-event",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "The base object of the ending asterisk path strategy",
   "main": "main.js",
   "dependencies": {},

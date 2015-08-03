@@ -5,18 +5,21 @@
 ```javascript
 var PathEvent = require('path-event'),
     Emitter = require('y-emitter'),
-    
+
     e = new Emitter();
 
-e.target.on('/*',function(pe){
+e.target.on('/*',function([pe]){
+  yield pe.handle();
   console.log('default');
 });
 
-e.target.on('/foo/bar',function(pe){
+e.target.on('/foo/bar',function([pe]){
+  yield pe.handle();
   console.log('foobar');
 });
 
-e.target.on('/foo/*',function(pe){
+e.target.on('/foo/*',function([pe]){
+  yield pe.handle();
   console.log('foo');
 });
 

@@ -1,72 +1,42 @@
-var remainingPath = Symbol(),
-    pathname = Symbol(),
-    emitter = Symbol();
+var Lock = require('y-lock'),
+    define = require('u-proto/define'),
+
+    lock = Symbol();
 
 
-function PathEvent(path,e){
-  this[pathname] = path;
-  this[emitter] = e;
+function PathEvent(path,e,max){
+  var rest,remaining;
 
-  this.rest = [];
+  this[lock] = new Lock(0);
+  e.give(path,[this,[]]);
+
+  remaining = path.split('/');
+  if(max != null && remaining.length > max){
+    rest = remaining.slice(max);
+    remaining = remaining.slice(0,max);
+  }else rest = [];
+
+  while(remaining.length > 1){
+    rest.unshift(remaining.pop());
+    path = remaining.concat('*').join('/');
+    e.give(path,[this,rest.slice()]);
+  }
+
+  this[lock].give();
 }
 
-PathEvent.prototype.next = function(){
-  var e = this[emitter],
-      name;
+PathEvent.prototype[define]({
 
-  if(!this[remainingPath]){
+  handle: function(){
+    return this[lock].take();
+  },
 
-    name = this[pathname];
-    this[remainingPath] = name.split('/');
-
-    if(e.target.listeners(name)){
-      e.give(name,this);
-      return;
-    }
-
+  free: function(){
+    return this[lock].give();
   }
 
-  while(this[remainingPath].length > 1){
+});
 
-    this.rest.unshift(this[remainingPath].pop());
-    name = this[remainingPath].concat('*').join('/');
-
-    if(e.target.listeners(name)){
-      e.give(name,this);
-      return;
-    }
-
-  }
-
-};
-
-PathEvent.prototype.prev = function(){
-  var e = this[emitter],
-      name;
-
-  while(this.rest.length){
-    this[remainingPath].push(this.rest.shift());
-    name = this[remainingPath].concat('*').join('/');
-
-    if(e.target.listeners(name)){
-      e.give(name,this);
-      return;
-    }
-
-  }
-
-  if(this[remainingPath]){
-
-    name = this[pathname];
-    this[remainingPath] = null;
-
-    if(e.target.listeners(name)){
-      e.give(name,this);
-      return;
-    }
-
-  }
-
-};
+/*/ exports /*/
 
 module.exports = PathEvent;

@@ -8,18 +8,15 @@ var PathEvent = require('path-event'),
 
     e = new Emitter();
 
-e.target.on('/*',function([pe]){
-  yield pe.handle();
+e.target.on('/*',function(){
   console.log('default');
 });
 
-e.target.on('/foo/bar',function([pe]){
-  yield pe.handle();
+e.target.on('/foo/bar',function(){
   console.log('foobar');
 });
 
-e.target.on('/foo/*',function([pe]){
-  yield pe.handle();
+e.target.on('/foo/*',function(){
   console.log('foo');
 });
 

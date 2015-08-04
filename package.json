@@ -5,7 +5,8 @@
   "main": "main.js",
   "dependencies": {
     "y-lock": "",
-    "u-proto": ""
+    "u-proto": "",
+    "y-walk": ""
   },
   "repository": {
     "type": "git",

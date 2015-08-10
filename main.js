@@ -15,6 +15,10 @@ PathEvent.prototype[define]({
 
   next: function(){
     return this[lock].give();
+  },
+
+  finally: function(){
+    return this[lock].take();
   }
 
 });
@@ -23,15 +27,8 @@ handle = walk.wrap(function*(pe,lock,path,e,max){
   var remaining = path.split('/'),
       rest;
 
-  e.give('*',[pe,remaining.slice(1)]);
-
-  yield lock.take();
-  lock.give();
-
-  e.give(path,[pe,[]]);
-
-  yield lock.take();
-  lock.give();
+  e.give('*',[pe,remaining.slice(1)],lock);
+  e.give(path,[pe,[]],lock);
 
   if(max != null && remaining.length > max){
     rest = remaining.slice(max);
@@ -42,10 +39,7 @@ handle = walk.wrap(function*(pe,lock,path,e,max){
     rest.unshift(remaining.pop());
     path = remaining.concat('*').join('/');
 
-    e.give(path,[pe,rest.slice()]);
-
-    yield lock.take();
-    lock.give();
+    e.give(path,[pe,rest.slice()],lock);
   }
 
 });

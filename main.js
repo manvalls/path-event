@@ -12,7 +12,7 @@ function PathEvent(path,e,max){
   e.give('*',[this,remaining.slice(1)],this[lock]);
   e.give(path,[this,[]],this[lock]);
 
-  if(max != null && remaining.length > --max){
+  if(max != null && remaining.length > ++max){
     rest = remaining.slice(max);
     remaining = remaining.slice(0,max);
   }else rest = [];

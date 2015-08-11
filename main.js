@@ -1,14 +1,29 @@
 var Lock = require('y-lock'),
     define = require('u-proto/define'),
-    walk = require('y-walk'),
 
-    lock = Symbol(),
-
-    handle;
+    lock = Symbol();
 
 function PathEvent(path,e,max){
+  var remaining = path.split('/'),
+      rest;
+
   this[lock] = new Lock(0);
-  handle(this,this[lock],path,e,max);
+
+  e.give('*',[this,remaining.slice(1)],this[lock]);
+  e.give(path,[this,[]],this[lock]);
+
+  if(max != null && remaining.length > --max){
+    rest = remaining.slice(max);
+    remaining = remaining.slice(0,max);
+  }else rest = [];
+
+  while(remaining.length > 1){
+    rest.unshift(remaining.pop());
+    path = remaining.concat('*').join('/');
+
+    e.give(path,[this,rest.slice()],this[lock]);
+  }
+
 }
 
 PathEvent.prototype[define]({
@@ -19,27 +34,6 @@ PathEvent.prototype[define]({
 
   finally: function(){
     return this[lock].take();
-  }
-
-});
-
-handle = walk.wrap(function*(pe,lock,path,e,max){
-  var remaining = path.split('/'),
-      rest;
-
-  e.give('*',[pe,remaining.slice(1)],lock);
-  e.give(path,[pe,[]],lock);
-
-  if(max != null && remaining.length > max){
-    rest = remaining.slice(max);
-    remaining = remaining.slice(0,max);
-  }else rest = [];
-
-  while(remaining.length > 1){
-    rest.unshift(remaining.pop());
-    path = remaining.concat('*').join('/');
-
-    e.give(path,[pe,rest.slice()],lock);
   }
 
 });

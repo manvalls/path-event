@@ -9,8 +9,8 @@ function PathEvent(path,e,max){
 
   this[lock] = new Lock(0);
 
-  e.give('*',[this,remaining.slice(1)],this[lock]);
-  e.give(path,[this,[]],this[lock]);
+  e.give('*',[this,remaining.slice(),path],this[lock]);
+  e.give(path,[this,[],''],this[lock]);
 
   if(max != null && remaining.length > ++max){
     rest = remaining.slice(max);
@@ -21,7 +21,7 @@ function PathEvent(path,e,max){
     rest.unshift(remaining.pop());
     path = remaining.concat('*').join('/');
 
-    e.give(path,[this,rest.slice()],this[lock]);
+    e.give(path,[this,rest.slice(),rest.join('/')],this[lock]);
   }
 
 }

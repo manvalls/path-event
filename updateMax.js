@@ -2,7 +2,7 @@
 function updateMax(target,prop){
   target.on(target.eventListened,onEvChange,prop);
   target.on(target.eventIgnored,onEvChange,prop);
-  onEvChange.call(this,null,null,prop);
+  onEvChange.call(target,null,null,prop);
 }
 
 function onEvChange(e,d,prop){

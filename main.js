@@ -1,16 +1,19 @@
 var Lock = require('y-lock'),
     define = require('u-proto/define'),
+    defer = require('y-resolver').defer,
 
-    lock = Symbol();
+    lock = Symbol(),
+    argument = Symbol();
+
+// PathEvent
 
 function PathEvent(path,e,max){
   var remaining = path.split('/'),
+      lk = this[lock] = new Lock(0),
       rest;
 
-  this[lock] = new Lock(0);
-
-  e.give('*',[this,remaining.slice(),path],this[lock]);
-  e.give(path,[this,[],''],this[lock]);
+  e.give('*',new Arg([this,remaining.slice(),path],lk));
+  e.give(path,new Arg([this,[],''],lk));
 
   if(max != null && remaining.length > ++max){
     rest = remaining.slice(max);
@@ -21,7 +24,7 @@ function PathEvent(path,e,max){
     rest.unshift(remaining.pop());
     path = remaining.concat('*').join('/');
 
-    e.give(path,[this,rest.slice(),rest.join('/')],this[lock]);
+    e.give(path,new Arg([this,rest.slice(),rest.join('/')],lk));
   }
 
 }
@@ -36,6 +39,17 @@ PathEvent.prototype[define]({
     return this[lock].take();
   }
 
+});
+
+// Arg
+
+function Arg(arg,lk){
+  this[argument] = arg;
+  this[lock] = lk;
+}
+
+Arg.prototype[define](defer,function(){
+  return this[lock].take(this[argument]);
 });
 
 /*/ exports /*/

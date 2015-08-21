@@ -8,12 +8,14 @@ var Lock = require('y-lock'),
 // PathEvent
 
 function PathEvent(path,e,max){
-  var remaining = path.split('/'),
-      lk = this[lock] = new Lock(0),
-      rest;
+  var lk = this[lock] = new Lock(0),
+      remaining,rest;
+
+  if(path == '*') path = '/*';
+  remaining = path.split('/');
 
   e.give('*',new Arg([this,remaining.slice(),path],lk));
-  e.give(path,new Arg([this,[],''],lk));
+  if(path.slice(-2) != '/*') e.give(path,new Arg([this,[],''],lk));
 
   if(max != null && remaining.length > ++max){
     rest = remaining.slice(max);

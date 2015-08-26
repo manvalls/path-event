@@ -72,3 +72,16 @@ Take another close look at the example. The `next` call continues the event flow
 - `got a dog!`
 - `got an animal!`
 - `nobody likes this one!`
+
+Note that if you use `target.until()` you'll skip the flow queue unless you *double yield*, e.g:
+
+```javascript
+
+target.walk(function*(){
+  var arr = yield this.until('/*'), // out of queue
+      [ev] = yield arr; // queued
+
+  console.log(ev == arr[0]); // true
+});
+
+```

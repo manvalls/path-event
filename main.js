@@ -1,6 +1,6 @@
 var Lock = require('y-lock'),
     define = require('u-proto/define'),
-    defer = require('y-resolver').defer,
+    deferrer = require('y-resolver').Yielded.deferrer,
 
     lock = Symbol(),
     argument = Symbol();
@@ -50,7 +50,7 @@ function Arg(arg,lk){
   this[lock] = lk;
 }
 
-Arg.prototype[define](defer,function(){
+Arg.prototype[define](deferrer,function(){
   return this[lock].take(this[argument]);
 });
 

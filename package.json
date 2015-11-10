@@ -4,9 +4,9 @@
   "description": "The base object of the ending asterisk path strategy",
   "main": "main.js",
   "dependencies": {
-    "y-lock": "",
-    "u-proto": "",
-    "y-resolver": ""
+    "u-proto": "^5.4.0",
+    "y-lock": "^2.0.3",
+    "y-resolver": "^6.1.0"
   },
   "repository": {
     "type": "git",

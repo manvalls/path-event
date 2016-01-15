@@ -5,8 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "u-proto": "^5.4.0",
-    "y-lock": "^2.0.3",
-    "y-resolver": "^6.1.0"
+    "y-lock": "^2.0.3"
   },
   "repository": {
     "type": "git",
@@ -16,5 +15,12 @@
     "url": "https://github.com/manvalls/path-event/issues"
   },
   "author": "Manuel Valls Fernández <manolo@vlrz.es>",
-  "license": "LGPL-3.0"
+  "license": "LGPL-3.0",
+  "devDependencies": {
+    "u-test": "^3.1.12",
+    "y-emitter": "^12.4.0"
+  },
+  "scripts": {
+    "test": "u-test"
+  }
 }

@@ -1,4 +1,4 @@
-# PathEvent
+# PathEvent [![Build Status][ci-img]][ci-url] [![Coverage Status][cover-img]][cover-url]
 
 The `PathEvent` class contains the logic behind the ending asterisk path strategy. Think of the event flow as an assembly line: when each listener is done with the event, it forwards it to the next one, until one of it decides that the event is fully handled and stops the flow.
 
@@ -14,31 +14,19 @@ Let's suppose our path is `/what/an/example/this/is`. With this example, the fol
 /*
 ```
 
-As you can see, all flows start with the `*` event. You can use it for logging or filtering purposes or just ignore it. Then, the original path is emitted as an event. The flow continues until the `/*` event is reached.
-
-The content of the events is an array of three elements. These are, in order of occurrence:
-
-- The **PathEvent** object
-- The **remaining parts**
-- The **remaining string**
-
-If we were listening for the `/what/an/*` event, our array would be:
-
-```javascript
-[ pathEvent, ['example','this','is'], 'example/this/is' ]
-```
-
-The `PathEvent` class has two methods: `next` and `finally`. Take a look at the following example:
+As you can see, all flows start with the `*` event. You can use it for logging or filtering purposes or just ignore it. Then, the original path is emitted as an event. The flow continues until the `/*` event is reached. Take a look at the following example:
 
 ```javascript
 
-target.on('/animals/dogs/*',function*([ ev, [breed] ]){
+target.on('/animals/dogs/*',function*(e){
+  var breed = e.argv(1)[0];
 
+  yield e.lock.take();
   if(breed == 'chihuahua'){
-    ev.next(); // Ignore chihuahuas
 
-    yield ev.finally(); // If everyone else ignores it,
-                        // take it back
+    e.lock.give();  // Ignore chihuahuas
+    yield e.lock.take();  // If everyone else ignores it,
+                          // take it back
 
     console.log('nobody likes this one!');
     return;
@@ -48,10 +36,12 @@ target.on('/animals/dogs/*',function*([ ev, [breed] ]){
 
 });
 
-target.on('/animals/*',function([ ev, [species, breed, colour] ]){
+target.on('/animals/*',function(e){
+  var colour = e.argv(3)[2];
 
+  yield e.lock.take();
   if(colour == 'black'){
-    ev.next(); // I can't see black animals
+    e.lock.give();  // I can't see black animals
     return;
   }
 
@@ -67,21 +57,13 @@ Consider these three events:
 - `/animals/dogs/chihuahua/white`
 - `/animals/dogs/chihuahua/black`
 
-Take another close look at the example. The `next` call continues the event flow, and the `finally` call returns a `Promise/A+` that gets accepted when the event flow gets past its last listener. Note that final promises have their own independent flow. That being said, the console output of those three events would be, respectively:
+The console output of those three events would be, respectively:
 
 - `got a dog!`
 - `got an animal!`
 - `nobody likes this one!`
 
-Note that if you use `target.until()` you'll skip the flow queue unless you *double yield*, e.g:
-
-```javascript
-
-target.walk(function*(){
-  var arr = yield this.until('/*'), // out of queue
-      [ev] = yield arr; // queued
-
-  console.log(ev == arr[0]); // true
-});
-
-```
+[ci-img]: https://circleci.com/gh/manvalls/path-event.svg?style=shield
+[ci-url]: https://circleci.com/gh/manvalls/path-event
+[cover-img]: https://coveralls.io/repos/manvalls/path-event/badge.svg?branch=master&service=github
+[cover-url]: https://coveralls.io/github/manvalls/path-event?branch=master

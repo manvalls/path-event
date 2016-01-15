@@ -1,57 +1,54 @@
 var Lock = require('y-lock'),
     define = require('u-proto/define'),
-    deferrer = require('y-resolver').Yielded.deferrer,
 
     lock = Symbol(),
-    argument = Symbol();
+    common = Symbol();
 
 // PathEvent
 
 function PathEvent(path,e,max){
-  var lk = this[lock] = new Lock(0),
-      remaining,rest;
+  var remaining,rest;
 
-  if(path == '*') path = '/*';
-  remaining = path.split('/');
+  this[lock] = new Lock(0);
+  this[common] = this;
 
-  e.give('*',new Arg([this,remaining.slice(),path],lk));
-  if(path.slice(-2) != '/*') e.give(path,new Arg([this,[],''],lk));
+  if(max != null){
+    remaining = path.split('/',max);
+    rest = [path.replace(remaining.join('/') + '/','')];
+  }else{
+    remaining = path.split('/');
+    rest = [];
+  }
 
-  if(max != null && remaining.length > ++max){
-    rest = remaining.slice(max);
-    remaining = remaining.slice(0,max);
-  }else rest = [];
+  e.give('*',Object.create(this,{
+    args: {value: path}
+  }));
 
-  while(remaining.length > 1){
-    rest.unshift(remaining.pop());
+  e.give(path,Object.create(this,{
+    args: {value: ''}
+  }));
+
+  while(remaining.length > 0){
     path = remaining.concat('*').join('/');
+    e.give(path,Object.create(this,{
+      args: {value: rest.join('/')}
+    }));
 
-    e.give(path,new Arg([this,rest.slice(),rest.join('/')],lk));
+    rest.unshift(remaining.pop());
   }
 
 }
 
 PathEvent.prototype[define]({
 
-  next: function(){
-    return this[lock].give();
-  },
+  get lock(){ return this[lock]; },
+  get common(){ return this[common]; },
 
-  finally: function(){
-    return this[lock].take();
+  argv: function(n){
+    if(n != null) return this.args.split('/',n);
+    return this.args.split('/');
   }
 
-});
-
-// Arg
-
-function Arg(arg,lk){
-  this[argument] = arg;
-  this[lock] = lk;
-}
-
-Arg.prototype[define](deferrer,function(){
-  return this[lock].take(this[argument]);
 });
 
 /*/ exports /*/

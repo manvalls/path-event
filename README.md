@@ -21,11 +21,11 @@ As you can see, all flows start with the `*` event. You can use it for logging o
 target.on('/animals/dogs/*',function*(e){
   var breed = e.argv(1)[0];
 
-  yield e.lock.take();
+  yield e.take();
   if(breed == 'chihuahua'){
 
-    e.lock.give();  // Ignore chihuahuas
-    yield e.lock.take();  // If everyone else ignores it,
+    e.give();  // Ignore chihuahuas
+    yield e.take();  // If everyone else ignores it,
                           // take it back
 
     console.log('nobody likes this one!');
@@ -39,9 +39,9 @@ target.on('/animals/dogs/*',function*(e){
 target.on('/animals/*',function(e){
   var colour = e.argv(3)[2];
 
-  yield e.lock.take();
+  yield e.take();
   if(colour == 'black'){
-    e.lock.give();  // I can't see black animals
+    e.give();  // I can't see black animals
     return;
   }
 

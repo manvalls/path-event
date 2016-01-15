@@ -1,3 +1,4 @@
+/**/ 'use strict' /**/
 var Lock = require('y-lock'),
     define = require('u-proto/define'),
 
@@ -9,7 +10,7 @@ var Lock = require('y-lock'),
 function PathEvent(path,e,max){
   var remaining,rest;
 
-  this[lock] = new Lock(0);
+  Lock.call(this,0);
   this[common] = this;
 
   if(max != null){
@@ -39,9 +40,10 @@ function PathEvent(path,e,max){
 
 }
 
+PathEvent.prototype = Object.create(Lock.prototype);
+PathEvent.prototype[define]('constructor',PathEvent);
 PathEvent.prototype[define]({
 
-  get lock(){ return this[lock]; },
   get common(){ return this[common]; },
 
   argv: function(n){

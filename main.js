@@ -1,6 +1,7 @@
 /**/ 'use strict' /**/
 var Lock = require('y-lock'),
     define = require('u-proto/define'),
+    pct = require('pct'),
 
     lock = Symbol(),
     common = Symbol();
@@ -47,11 +48,17 @@ PathEvent.prototype[define]({
   get common(){ return this[common]; },
 
   argv: function(n){
-    if(n != null) return this.args.split('/',n);
-    return this.args.split('/');
+    if(n != null) return this.args.split('/',n).map(decode);
+    return this.args.split('/').map(decode);
   }
 
 });
+
+// - utils
+
+function decode(arg){
+  return pct.decodeComponent(arg);
+}
 
 /*/ exports /*/
 

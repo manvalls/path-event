@@ -4,6 +4,7 @@
   "description": "The base object of the ending asterisk path strategy",
   "main": "main.js",
   "dependencies": {
+    "pct": "^1.1.0",
     "u-proto": "^5.4.0",
     "y-lock": "^2.0.3"
   },

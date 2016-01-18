@@ -9,21 +9,13 @@ var Lock = require('y-lock'),
 // PathEvent
 
 function PathEvent(path,e,max,prefixes){
-  var remaining,rest,prefix,args;
+  var remaining,rest,prefix,args,joined;
 
   prefixes = prefixes || [];
   prefixes.push('');
 
   Lock.call(this,0);
   this[common] = this;
-
-  if(max != null){
-    remaining = path.split('/',max);
-    rest = [path.replace(remaining.join('/') + '/','')];
-  }else{
-    remaining = path.split('/');
-    rest = [];
-  }
 
   for(prefix of prefixes) e.give(prefix + '*',Object.create(this,{
     args: {value: path}
@@ -33,7 +25,26 @@ function PathEvent(path,e,max,prefixes){
     args: {value: ''}
   }));
 
-  while(remaining.length > 0){
+  if(max != null){
+
+    if(!max){
+      remaining = [];
+      rest = [path];
+    }else{
+      remaining = path.split('/',max + 1);
+      joined = remaining.join('/');
+
+      if(joined == path) rest = [];
+      else rest = [path.replace(joined + '/','')];
+    }
+
+  }else{
+    remaining = path.split('/');
+    rest = [];
+  }
+
+  while(remaining.length > 1){
+    rest.unshift(remaining.pop());
     path = remaining.concat('*').join('/');
     args = rest.join('/');
 
@@ -41,7 +52,6 @@ function PathEvent(path,e,max,prefixes){
       args: {value: args}
     }));
 
-    rest.unshift(remaining.pop());
   }
 
 }

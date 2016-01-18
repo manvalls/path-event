@@ -65,6 +65,10 @@ t('Event flow',function(){
     e.give();
   });
 
+  target.on('/lorem/ipsum/dolor/sit/*',function*(e){
+    yield e.take(); // this should never happen
+  });
+
   target.on('/lorem/ipsum/dolor/sit',function*(e){
     yield e.take();
     assert.strictEqual(e.args,'');
@@ -112,5 +116,62 @@ t('Event flow',function(){
   e = new PathEvent('/lorem/ipsum/dolor/sit',emitter);
   e.give();
   assert.strictEqual(e.step,6);
+
+});
+
+t('Event flow with rest',function(){
+  var emitter = new Emitter(),
+      target = emitter.target,
+      e;
+
+  updateMax(target,max);
+
+  target.on('*',function*(e){
+    yield e.take();
+    assert.strictEqual(e.args,'/lorem/ipsum/dolor/sit/amet');
+    assert.strictEqual(e.step,undefined);
+    e.common.step = 1;
+    e.give();
+  });
+
+  target.on('/lorem/ipsum/dolor/*',function*(e){
+    yield e.take();
+    assert.strictEqual(e.args,'sit/amet');
+    assert.strictEqual(e.step,1);
+    e.common.step = 2;
+    e.give();
+  });
+
+  target.on('/lorem/ipsum/*',function*(e){
+    yield e.take();
+    assert.strictEqual(e.args,'dolor/sit/amet');
+    assert.strictEqual(e.step,2);
+    e.common.step = 3;
+    e.give();
+  });
+
+  target.on('/lorem/*',function*(e){
+    yield e.take();
+    assert.strictEqual(e.args,'ipsum/dolor/sit/amet');
+    assert.strictEqual(e.step,3);
+    e.common.step = 4;
+    e.give();
+  });
+
+  target.on('/*',function*(e){
+    yield e.take();
+    assert.strictEqual(e.args,'lorem/ipsum/dolor/sit/amet');
+    assert.strictEqual(e.step,4);
+    e.common.step = 5;
+    e.give();
+  });
+
+  e = new PathEvent('/lorem/ipsum/dolor/sit/amet',emitter,target[max]);
+  e.give();
+  assert.strictEqual(e.step,5);
+
+  e = new PathEvent('/lorem/ipsum/dolor/sit/amet',emitter);
+  e.give();
+  assert.strictEqual(e.step,5);
 
 });

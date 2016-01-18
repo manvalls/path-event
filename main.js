@@ -8,8 +8,11 @@ var Lock = require('y-lock'),
 
 // PathEvent
 
-function PathEvent(path,e,max){
-  var remaining,rest;
+function PathEvent(path,e,max,prefixes){
+  var remaining,rest,prefix,args;
+
+  prefixes = prefixes || [];
+  prefixes.push('');
 
   Lock.call(this,0);
   this[common] = this;
@@ -22,18 +25,20 @@ function PathEvent(path,e,max){
     rest = [];
   }
 
-  e.give('*',Object.create(this,{
+  for(prefix of prefixes) e.give(prefix + '*',Object.create(this,{
     args: {value: path}
   }));
 
-  e.give(path,Object.create(this,{
+  for(prefix of prefixes) e.give(prefix + path,Object.create(this,{
     args: {value: ''}
   }));
 
   while(remaining.length > 0){
     path = remaining.concat('*').join('/');
-    e.give(path,Object.create(this,{
-      args: {value: rest.join('/')}
+    args = rest.join('/');
+
+    for(prefix of prefixes) e.give(prefix + path,Object.create(this,{
+      args: {value: args}
     }));
 
     rest.unshift(remaining.pop());

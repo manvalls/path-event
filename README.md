@@ -1,6 +1,6 @@
 # PathEvent [![Build Status][ci-img]][ci-url] [![Coverage Status][cover-img]][cover-url]
 
-The `PathEvent` class contains the logic behind the ending asterisk path strategy. Think of the event flow as an assembly line: when each listener is done with the event, it forwards it to the next one, until one of it decides that the event is fully handled and stops the flow.
+The `PathEvent` class, which inherits from `y-lock`, contains the logic behind the ending asterisk path strategy. Think of the event flow as an assembly line: when each listener is done with the event, it forwards it to the next one, until one of it decides that the event is fully handled and stops the flow.
 
 Let's suppose our path is `/what/an/example/this/is`. With this example, the following events will be emitted, one after another:
 
@@ -14,7 +14,26 @@ Let's suppose our path is `/what/an/example/this/is`. With this example, the fol
 /*
 ```
 
-As you can see, all flows start with the `*` event. You can use it for logging or filtering purposes or just ignore it. Then, the original path is emitted as an event. The flow continues until the `/*` event is reached. Take a look at the following example:
+As you can see, all flows start with the `*` event. You can use it for logging or filtering purposes or just ignore it. Then, the original path is emitted as an event. The flow continues until the `/*` event is reached. Prefixes are allowed, e.g if you were using `hsm` and a `POST` request was what originated the event, the flow would be the following:
+
+```
+POST *
+*
+POST /what/an/example/this/is
+/what/an/example/this/is
+POST /what/an/example/this/*
+/what/an/example/this/*
+POST /what/an/example/*
+/what/an/example/*
+POST /what/an/*
+/what/an/*
+POST /what/*
+/what/*
+POST /*
+/*
+```
+
+Each event object inherits from `event.common` which is the original `PathEvent` instance. `event.args` contains the rest of the path, e.g `an/example/this/is`. `event.argv(n)` returns an array of length `n` with each decoded component of the path. Take a look at the following example:
 
 ```javascript
 

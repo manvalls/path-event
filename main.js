@@ -17,10 +17,6 @@ function PathEvent(path,e,max,prefixes){
   Lock.call(this,0);
   this[common] = this;
 
-  for(prefix of prefixes) e.give(prefix + '*',Object.create(this,{
-    args: {value: path}
-  }));
-
   for(prefix of prefixes) e.give(prefix + path,Object.create(this,{
     args: {value: ''}
   }));

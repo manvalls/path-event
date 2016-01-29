@@ -5,7 +5,6 @@ The `PathEvent` class, which inherits from `y-lock`, contains the logic behind t
 Let's suppose our path is `/what/an/example/this/is`. With this example, the following events will be emitted, one after another:
 
 ```
-*
 /what/an/example/this/is
 /what/an/example/this/*
 /what/an/example/*
@@ -14,11 +13,9 @@ Let's suppose our path is `/what/an/example/this/is`. With this example, the fol
 /*
 ```
 
-As you can see, all flows start with the `*` event. You can use it for logging or filtering purposes or just ignore it. Then, the original path is emitted as an event. The flow continues until the `/*` event is reached. Prefixes are allowed, e.g if you were using `hsm` and a `POST` request was what originated the event, the flow would be the following:
+As you can see, all flows start with the original path. The flow continues until the `/*` event is reached. Prefixes are allowed, e.g if you were using `hsm` and a `POST` request was what originated the event, the flow would be the following:
 
 ```
-POST *
-*
 POST /what/an/example/this/is
 /what/an/example/this/is
 POST /what/an/example/this/*

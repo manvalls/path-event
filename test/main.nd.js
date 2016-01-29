@@ -11,7 +11,7 @@ t('Top event',function(){
       n = 0,
       last;
 
-  target.on('*',function(e){
+  target.on('/*',function(e){
     n++;
     last = e;
   });
@@ -21,15 +21,15 @@ t('Top event',function(){
 
   new PathEvent('/foo/bar',emitter,target[max]);
   assert.strictEqual(n,1);
-  assert.strictEqual(last.args,'/foo/bar');
-  assert.deepEqual(last.argv(),['','foo','bar']);
-  assert.deepEqual(last.argv(2),['','foo']);
+  assert.strictEqual(last.args,'foo/bar');
+  assert.deepEqual(last.argv(),['foo','bar']);
+  assert.deepEqual(last.argv(1),['foo']);
 
   new PathEvent('/*',emitter,target[max]);
-  assert.strictEqual(n,2);
-  assert.strictEqual(last.args,'/*');
-  assert.deepEqual(last.argv(),['','*']);
-  assert.deepEqual(last.argv(1),['']);
+  assert.strictEqual(n,3);
+  assert.strictEqual(last.args,'*');
+  assert.deepEqual(last.argv(),['*']);
+  assert.deepEqual(last.argv(1),['*']);
 });
 
 t('Full event',function*(){
@@ -57,9 +57,9 @@ t('Event flow',function(){
 
   updateMax(target,max);
 
-  target.on('*',function*(e){
-    yield e.take();
-    assert.strictEqual(e.args,'/lorem/ipsum/dolor/sit');
+  target.on('/*',function*(e){
+    yield e.capture();
+    assert.strictEqual(e.args,'lorem/ipsum/dolor/sit');
     assert.strictEqual(e.step,undefined);
     e.common.step = 1;
     e.give();
@@ -126,9 +126,9 @@ t('Event flow with rest',function(){
 
   updateMax(target,max);
 
-  target.on('*',function*(e){
-    yield e.take();
-    assert.strictEqual(e.args,'/lorem/ipsum/dolor/sit/amet');
+  target.on('/*',function*(e){
+    yield e.capture();
+    assert.strictEqual(e.args,'lorem/ipsum/dolor/sit/amet');
     assert.strictEqual(e.step,undefined);
     e.common.step = 1;
     e.give();

@@ -41,8 +41,8 @@ target.on('/animals/dogs/*',function*(e){
   if(breed == 'chihuahua'){
 
     e.give();  // Ignore chihuahuas
-    yield e.take();  // If everyone else ignores it,
-                          // take it back
+    yield e.take();   // If everyone else ignores it,
+                      // take it back
 
     console.log('nobody likes this one!');
     return;

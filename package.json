@@ -5,7 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "pct": "^1.1.0",
-    "u-proto": "^5.4.5",
+    "u-proto": "^6.4.1",
     "y-lock": "^3.1.0"
   },
   "repository": {
@@ -18,8 +18,8 @@
   "author": "Manuel Valls Fernández <manolo@vlrz.es>",
   "license": "LGPL-3.0",
   "devDependencies": {
-    "u-test": "^3.4.0",
-    "y-emitter": "^12.4.0"
+    "u-test": "^3.7.0",
+    "y-emitter": "^12.4.2"
   },
   "scripts": {
     "test": "u-test"

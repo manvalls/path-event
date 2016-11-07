@@ -1,6 +1,5 @@
 /**/ 'use strict' /**/
 var Lock = require('y-lock'),
-    define = require('u-proto/define'),
     pct = require('pct'),
 
     common = Symbol();
@@ -9,14 +8,17 @@ var Lock = require('y-lock'),
 
 class PathEvent extends Lock{
 
-  constructor(path,e,max,prefixes){
+  constructor(){
+    super(0);
+    this[common] = this;
+    if(arguments.length) this.emit(...arguments);
+  }
+
+  emit(path,e,max,prefixes){
     var remaining,rest,prefix,args,joined;
 
     prefixes = prefixes || [];
     prefixes.push('');
-
-    super(0);
-    this[common] = this;
 
     for(prefix of prefixes) e.give(prefix + path,Object.create(this,{
       args: {value: ''}

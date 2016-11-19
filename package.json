@@ -15,7 +15,7 @@
     "url": "https://github.com/manvalls/path-event/issues"
   },
   "author": "Manuel Valls Fernández <manolo@vlrz.es>",
-  "license": "LGPL-3.0",
+  "license": "Apache-2.0",
   "devDependencies": {
     "u-test": "^3.8.8",
     "y-emitter": "^12.4.4"

@@ -17,6 +17,7 @@ class PathEvent extends Lock{
   emit(path,e,max,prefixes){
     var remaining,rest,prefix,args,joined;
 
+    path = path.replace(/\*/g,'%2A');
     prefixes = prefixes || [];
     prefixes.push('');
 

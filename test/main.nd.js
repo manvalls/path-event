@@ -26,8 +26,8 @@ t('Top event',function(){
   assert.deepEqual(last.argv(1),['foo']);
 
   new PathEvent('/*',emitter,target[max]);
-  assert.strictEqual(n,3);
-  assert.strictEqual(last.args,'*');
+  assert.strictEqual(n,2);
+  assert.strictEqual(last.args,'%2A');
   assert.deepEqual(last.argv(),['*']);
   assert.deepEqual(last.argv(1),['*']);
 });

@@ -1,9 +1,7 @@
 var t = require('u-test'),
     assert = require('assert'),
     Emitter = require('y-emitter'),
-    PathEvent = require('../main.js'),
-    updateMax = require('../updateMax.js'),
-    max = Symbol();
+    PathEvent = require('../main.js');
 
 t('Top event',function(){
   var emitter = new Emitter(),
@@ -16,16 +14,15 @@ t('Top event',function(){
     last = e;
   });
 
-  updateMax(target,max);
   assert.strictEqual(n,0);
 
-  new PathEvent('/foo/bar',emitter,target[max]);
+  new PathEvent('/foo/bar',emitter);
   assert.strictEqual(n,1);
   assert.strictEqual(last.args,'foo/bar');
   assert.deepEqual(last.argv(),['foo','bar']);
   assert.deepEqual(last.argv(1),['foo']);
 
-  new PathEvent('/*',emitter,target[max]);
+  new PathEvent('/*',emitter);
   assert.strictEqual(n,2);
   assert.strictEqual(last.args,'%2A');
   assert.deepEqual(last.argv(),['*']);
@@ -37,17 +34,15 @@ t('Full event',function*(){
       target = emitter.target,
       yd,e;
 
-  updateMax(target,max);
-  yd = target.until('/foo/bar');
-  new PathEvent('/foo/bar',emitter,target[max]);
+  yd = target.until('/foo/$/?');
+  setTimeout(() => new PathEvent('/foo/bar',emitter));
   e = yield yd;
-  assert.strictEqual(e.args,'');
+  assert.strictEqual(e.args,null);
 
-  updateMax(target,max);
   yd = target.until('e/404');
-  new PathEvent('e/404',emitter,target[max]);
+  setTimeout(() => new PathEvent('e/404',emitter));
   e = yield yd;
-  assert.strictEqual(e.args,'');
+  assert.strictEqual(e.args,null);
 });
 
 t('Event flow',function(){
@@ -55,9 +50,7 @@ t('Event flow',function(){
       target = emitter.target,
       e;
 
-  updateMax(target,max);
-
-  target.on('/*',function*(e){
+  target.on('/?',function*(e){
     yield e.capture();
     assert.strictEqual(e.args,'lorem/ipsum/dolor/sit');
     assert.strictEqual(e.step,undefined);
@@ -69,53 +62,63 @@ t('Event flow',function(){
     yield e.take(); // this should never happen
   });
 
-  target.on('/lorem/ipsum/dolor/sit',function*(e){
+  target.on('/lorem/$/dolor/sit',function*(e){
     yield e.take();
-    assert.strictEqual(e.args,'');
+    assert.strictEqual(e.args,null);
     assert.strictEqual(e.step,1);
+    assert.strictEqual(e.params.lorem, 'ipsum');
     e.common.step = 2;
+    e.give();
+  });
+
+  target.on('/lorem/$/dolor/sit/?',function*(e){
+    yield e.take();
+    assert.strictEqual(e.args,null);
+    assert.strictEqual(e.step,2);
+    assert.strictEqual(e.params.lorem, 'ipsum');
+    e.common.step = 3;
     e.give();
   });
 
   target.on('/lorem/ipsum/dolor/*',function*(e){
     yield e.take();
     assert.strictEqual(e.args,'sit');
-    assert.strictEqual(e.step,2);
-    e.common.step = 3;
+    assert.strictEqual(e.step,3);
+    e.common.step = 4;
     e.give();
   });
 
   target.on('/lorem/ipsum/*',function*(e){
     yield e.take();
     assert.strictEqual(e.args,'dolor/sit');
-    assert.strictEqual(e.step,3);
-    e.common.step = 4;
+    assert.strictEqual(e.step,4);
+    e.common.step = 5;
     e.give();
   });
 
   target.on('/lorem/*',function*(e){
     yield e.take();
     assert.strictEqual(e.args,'ipsum/dolor/sit');
-    assert.strictEqual(e.step,4);
-    e.common.step = 5;
+    assert.strictEqual(e.step,5);
+    e.common.step = 6;
     e.give();
   });
 
   target.on('/*',function*(e){
     yield e.take();
     assert.strictEqual(e.args,'lorem/ipsum/dolor/sit');
-    assert.strictEqual(e.step,5);
-    e.common.step = 6;
+    assert.strictEqual(e.step,6);
+    e.common.step = 7;
     e.give();
   });
 
-  e = new PathEvent('/lorem/ipsum/dolor/sit',emitter,target[max]);
+  e = new PathEvent('/lorem/ipsum/dolor/sit',emitter);
   e.give();
-  assert.strictEqual(e.step,6);
+  assert.strictEqual(e.step,7);
 
   e = new PathEvent('/lorem/ipsum/dolor/sit',emitter);
   e.give();
-  assert.strictEqual(e.step,6);
+  assert.strictEqual(e.step,7);
 
 });
 
@@ -123,8 +126,6 @@ t('Event flow with rest',function(){
   var emitter = new Emitter(),
       target = emitter.target,
       e;
-
-  updateMax(target,max);
 
   target.on('/*',function*(e){
     yield e.capture();
@@ -166,7 +167,7 @@ t('Event flow with rest',function(){
     e.give();
   });
 
-  e = new PathEvent('/lorem/ipsum/dolor/sit/amet',emitter,target[max]);
+  e = new PathEvent('/lorem/ipsum/dolor/sit/amet',emitter);
   e.give();
   assert.strictEqual(e.step,5);
 

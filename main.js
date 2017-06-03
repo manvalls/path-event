@@ -53,6 +53,10 @@ class PathEvent extends Lock{
     return this.args.split('/').map(decode);
   }
 
+  next(){
+    return this.give();
+  }
+
   get common(){
     return this[common];
   }

@@ -55,7 +55,7 @@ t('Event flow',function(){
     assert.strictEqual(e.args,'lorem/ipsum/dolor/sit');
     assert.strictEqual(e.step,undefined);
     e.common.step = 1;
-    e.give();
+    e.next();
   });
 
   target.on('/lorem/ipsum/dolor/sit/*',function*(e){
